@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="documents_document_search_inherit" model="ir.ui.view">
+        <field name="name">documents.document.search.inherit</field>
+        <field name="model">documents.document</field>
+        <field name="inherit_id" ref="documents.document_view_search"/>
+        <field name="arch" type="xml">
+            <!-- Ajuste del xpath a la estructura correcta de la vista -->
+            <xpath expr="//group" position="inside">
+                <!-- Agrupar por estado -->
+                <filter string="Estado" name="group_by_state" context="{'group_by':'state'}"/>
+            </xpath>
+            <xpath expr="//group" position="inside">
+                <!-- Filtros rápidos -->
+                <filter string="Estado Borrador" name="filter_state_draft" domain="[('state', '=', 'draft')]"/>
+                <filter string="Pendiente de Etiquetas" name="filter_state_pending" domain="[('state', '=', 'pending_tags')]"/>
+                <filter string="Completado" name="filter_state_done" domain="[('state', '=', 'done')]"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="documents_document_view_form_inherit" model="ir.ui.view">
+        <field name="name">documents.document.form.inherit</field>
+        <field name="model">documents.document</field>
+        <field name="inherit_id" ref="documents.document_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//sheet" position="before">
+                <header>
+                    <field name="state" widget="statusbar"/>
+                    <button name="action_validate_tags"
+                            string="Validar Etiquetas"
+                            type="object"
+                            class="oe_highlight"
+                            invisible="state != 'pending_tags'"/>
+                </header>
+            </xpath>
+            <xpath expr="//field[@name='tag_ids']" position="attributes">
+                <attribute name="required">state == 'pending_tags'</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="documents_document_kanban_inherit" model="ir.ui.view">
+        <field name="name">documents.document.kanban.inherit</field>
+        <field name="model">documents.document</field>
+        <field name="inherit_id" ref="documents.document_view_kanban"/>
+        <field name="arch" type="xml">
+            <xpath expr="//kanban" position="attributes">
+                <attribute name="default_group_by">state</attribute>
+            </xpath>
+            <xpath expr="//field[@name='tag_ids']" position="after">
+                <field name="state"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>
